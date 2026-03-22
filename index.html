@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Carga Certa · Jhon Guimarães</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff;--surface:#ffffff;--surface2:#f8f6f3;--border:#edeae4;--border2:#e2ddd6;
+  --coral:#d4622a;--coral2:#e8784a;--coral-light:#fdf1eb;--coral-mid:#fbe0d0;
+  --green:#2a7a52;--green-light:#edf7f2;--green-mid:#c8eada;
+  --yellow:#a06818;--yellow-light:#fef9ee;--yellow-mid:#fdecc8;
+  --red:#b83030;--red-light:#fdf0f0;--red-mid:#f8cccc;
+  --orange:#c85820;--orange-light:#fef3ee;--orange-mid:#fad8c0;
+  --text:#1c1612;--text2:#5a4e44;--muted:#9a8e84;--r:20px;--rs:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{background:#ffffff}
+body{background:#ffffff !important;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;min-height:100vh;overflow-x:hidden;font-size:16px}
+.wrap{max-width:480px;margin:0 auto;padding:0 22px 100px;background:#ffffff}
+
+.hdr{padding:52px 0 36px;text-align:center}
+.hdr h1{font-family:'Cormorant Garamond',serif;font-size:64px;font-weight:700;line-height:.95;color:var(--text);margin-bottom:10px;letter-spacing:-1px}
+.hdr h1 em{font-style:italic;color:var(--coral)}
+.hdr-name{font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
+.hdr-desc{font-size:16px;color:var(--text2);font-weight:400;line-height:1.7;max-width:320px;margin:0 auto}
+
+.progress{margin-bottom:32px}
+.progress-track{height:3px;background:var(--border);border-radius:2px;margin-bottom:12px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--coral),var(--coral2));border-radius:2px;transition:width .6s cubic-bezier(.16,1,.3,1)}
+.progress-info{display:flex;justify-content:space-between;align-items:center}
+.progress-step{font-size:13px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--muted)}
+.progress-dots{display:flex;gap:6px}
+.pdot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:all .3s}
+.pdot.done{background:var(--coral)}
+.pdot.active{background:var(--coral2);transform:scale(1.35)}
+
+.screen{display:none}
+.screen.active{display:block;animation:up .45s cubic-bezier(.16,1,.3,1) both}
+
+.card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:26px;margin-bottom:14px;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:transparent;border-radius:var(--r) var(--r) 0 0}
+.card.focused::before{background:linear-gradient(90deg,var(--coral),var(--coral2))}
+.c-label{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.c-title{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;color:var(--text);margin-bottom:8px;line-height:1.2}
+.c-sub{font-size:15px;color:var(--text2);margin-bottom:22px;line-height:1.6}
+
+.sel-wrap{position:relative}
+.sel-wrap select{width:100%;background:var(--surface2);border:1.5px solid var(--border2);border-radius:var(--rs);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;font-weight:500;padding:16px 44px 16px 18px;outline:none;-webkit-appearance:none;appearance:none;cursor:pointer;transition:border-color .2s}
+.sel-wrap select:focus{border-color:var(--coral)}
+.sel-wrap::after{content:'';position:absolute;right:18px;top:50%;transform:translateY(-50%);width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid var(--muted);pointer-events:none}
+
+.dica{display:none;margin-top:12px;background:var(--coral-light);border:1px solid var(--coral-mid);border-radius:var(--rs);padding:16px 18px}
+.dica-row{display:flex;gap:12px}
+.dica-title{font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--coral);margin-bottom:6px}
+.dica-text{font-size:14px;color:var(--text2);line-height:1.65}
+
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chip{background:var(--surface2);border:1.5px solid var(--border2);border-radius:var(--rs);padding:12px 20px;font-size:15px;font-weight:600;color:var(--text2);cursor:pointer;transition:all .15s;font-family:'Plus Jakarta Sans',sans-serif}
+.chip:hover{border-color:var(--coral);color:var(--coral)}
+.chip.on{background:var(--coral-light);border-color:var(--coral);color:var(--coral)}
+
+.goal-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.gpill{background:var(--surface2);border:1.5px solid var(--border2);border-radius:var(--r);padding:20px 14px;cursor:pointer;transition:all .2s;text-align:center;font-family:'Plus Jakarta Sans',sans-serif;color:var(--text2)}
+.gpill .gi{font-size:28px;display:block;margin-bottom:10px}
+.gpill .gt{font-size:15px;font-weight:600;display:block;margin-bottom:3px}
+.gpill .gs{font-size:12px;color:var(--muted);display:block;line-height:1.4}
+.gpill:hover{border-color:var(--coral)}
+.gpill.on{background:var(--coral-light);border-color:var(--coral)}
+.gpill.on .gt{color:var(--coral)}
+
+.scheme-list{display:flex;flex-direction:column;gap:10px}
+.spill{display:flex;align-items:center;gap:16px;background:var(--surface2);border:1.5px solid var(--border2);border-radius:var(--rs);padding:16px 18px;cursor:pointer;transition:all .2s;font-family:'Plus Jakarta Sans',sans-serif;width:100%;text-align:left}
+.spill:hover{border-color:var(--coral)}
+.spill.on{background:var(--coral-light);border-color:var(--coral)}
+.spill-vis{display:flex;align-items:flex-end;gap:3px;flex-shrink:0;height:28px}
+.spill-vis span{display:block;width:7px;border-radius:2px;background:var(--border2);transition:background .2s}
+.spill.on .spill-vis span{background:var(--coral)}
+.spill-name{font-size:16px;font-weight:600;color:var(--text);margin-bottom:3px}
+.spill.on .spill-name{color:var(--coral)}
+.spill-desc{font-size:13px;color:var(--muted)}
+.spill-eg{font-size:12px;color:var(--text2);font-weight:500;margin-top:3px}
+
+.stepper{display:flex;align-items:center;gap:16px;justify-content:center;padding:8px 0}
+.stbtn{width:52px;height:52px;border-radius:50%;background:var(--surface2);border:1.5px solid var(--border2);color:var(--text);font-size:26px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;font-family:'Plus Jakarta Sans',sans-serif;font-weight:300}
+.stbtn:hover{border-color:var(--coral);color:var(--coral)}
+.stbtn:active{transform:scale(.93)}
+.stval{font-family:'Cormorant Garamond',serif;font-size:64px;font-weight:700;color:var(--coral);min-width:80px;text-align:center;line-height:1}
+.stunit{font-size:14px;color:var(--muted);text-align:center;margin-top:4px}
+
+.carga-group{display:flex;align-items:flex-end;gap:10px;margin-bottom:8px}
+.carga-inner{flex:1}
+.carga-label{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.carga-input{width:100%;background:var(--surface2);border:1.5px solid var(--border2);border-radius:var(--rs);color:var(--text);font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:700;padding:14px 18px;outline:none;transition:border-color .2s;-webkit-appearance:none;letter-spacing:-0.5px;text-align:center}
+.carga-input:focus{border-color:var(--coral)}
+.carga-input::placeholder{color:var(--border2)}
+.carga-unit{background:var(--surface2);border:1.5px solid var(--border2);border-radius:var(--rs);padding:14px 18px;font-size:16px;font-weight:600;color:var(--muted);height:72px;display:flex;align-items:center}
+
+.rir-list{display:flex;flex-direction:column;gap:9px}
+.ropt{display:flex;align-items:center;gap:16px;background:var(--surface2);border:1.5px solid var(--border2);border-radius:var(--rs);padding:18px;cursor:pointer;transition:all .18s;text-align:left;font-family:'Plus Jakarta Sans',sans-serif;width:100%}
+.ropt:hover{border-color:var(--coral)}
+.ropt.on{border-color:var(--coral);background:var(--coral-light)}
+.ropt-n{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:700;color:var(--muted);width:26px;flex-shrink:0;line-height:1}
+.ropt.on .ropt-n{color:var(--coral)}
+.ropt-txt{font-size:16px;font-weight:500;color:var(--text);line-height:1.5}
+
+.alert-warn{background:var(--yellow-light);border:1px solid var(--yellow-mid);border-radius:var(--rs);padding:15px 17px;margin-top:12px;display:none}
+.alert-warn-inner{display:flex;gap:10px;align-items:flex-start}
+.alert-warn-txt{font-size:14px;color:var(--yellow);line-height:1.6}
+
+.btn{width:100%;background:var(--coral);border:none;border-radius:50px;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:17px;font-weight:700;padding:19px;cursor:pointer;letter-spacing:.3px;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px}
+.btn:hover{background:var(--coral2);transform:translateY(-1px);box-shadow:0 8px 28px rgba(212,98,42,.28)}
+.btn:active{transform:scale(.98);box-shadow:none}
+.btn-ghost{width:100%;background:transparent;border:1.5px solid var(--border2);border-radius:50px;color:var(--text2);font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:600;padding:17px;cursor:pointer;transition:all .2s;margin-top:10px}
+.btn-ghost:hover{border-color:var(--coral);color:var(--coral)}
+
+#loading{display:none;text-align:center;padding:100px 20px;animation:up .4s ease both}
+.spin{width:48px;height:48px;border:2.5px solid var(--border);border-top-color:var(--coral);border-radius:50%;animation:rot .8s linear infinite;margin:0 auto 18px}
+
+#result{display:none}
+.res-hdr{padding:44px 0 20px;animation:up .6s ease both}
+.res-badge{display:inline-flex;align-items:center;gap:8px;background:var(--coral-light);border:1px solid var(--coral-mid);border-radius:40px;padding:8px 18px;margin-bottom:18px}
+.res-ex-name{font-family:'Cormorant Garamond',serif;font-size:42px;font-weight:700;line-height:1;color:var(--text)}
+
+.ctx-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.ctx-tag{background:var(--surface2);border:1px solid var(--border);border-radius:30px;padding:6px 14px;font-size:13px;font-weight:600;color:var(--text2)}
+.ctx-tag b{color:var(--coral)}
+
+.verd{border-radius:var(--r);padding:28px 24px;margin-bottom:14px;position:relative;overflow:hidden}
+.verd-deco{position:absolute;top:-40px;right:-40px;width:160px;height:160px;border-radius:50%;opacity:.07}
+.verd.ideal{background:var(--green-light);border:1.5px solid var(--green-mid)}
+.verd.ideal .verd-deco{background:var(--green)}
+.verd.leve,.verd.muito-leve{background:var(--yellow-light);border:1.5px solid var(--yellow-mid)}
+.verd.leve .verd-deco,.verd.muito-leve .verd-deco{background:var(--yellow)}
+.verd.pesada{background:var(--orange-light);border:1.5px solid var(--orange-mid)}
+.verd.pesada .verd-deco{background:var(--orange)}
+.verd.muito-pesada{background:var(--red-light);border:1.5px solid var(--red-mid)}
+.verd.muito-pesada .verd-deco{background:var(--red)}
+.verd-icon{font-size:48px;margin-bottom:12px;display:block}
+.verd-tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:5px 14px;border-radius:30px;margin-bottom:12px}
+.ideal .verd-tag{background:var(--green-mid);color:var(--green)}
+.leve .verd-tag,.muito-leve .verd-tag{background:var(--yellow-mid);color:var(--yellow)}
+.pesada .verd-tag,.muito-pesada .verd-tag{background:var(--red-mid);color:var(--red)}
+.verd-title{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:700;color:var(--text);margin-bottom:10px;line-height:1.1}
+.verd-desc{font-size:15px;color:var(--text2);line-height:1.7;margin-bottom:20px}
+.gauge{height:8px;background:rgba(0,0,0,.08);border-radius:4px;overflow:hidden;margin-bottom:8px}
+.gauge-fill{height:100%;border-radius:4px;transition:width 1.3s cubic-bezier(.34,1.56,.64,1);width:0}
+.gauge-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);font-weight:600}
+
+.next-hero{background:var(--coral);border-radius:var(--r);padding:30px 24px;margin-bottom:14px;text-align:center;color:#fff;position:relative;overflow:hidden}
+.next-hero::before{content:'';position:absolute;top:-50px;right:-50px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.06)}
+.nh-label{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;opacity:.75;margin-bottom:10px}
+.nh-value{font-family:'Cormorant Garamond',serif;font-size:72px;font-weight:700;line-height:1;margin-bottom:6px;letter-spacing:-1px}
+.nh-sub{font-size:15px;opacity:.85}
+
+.series-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:24px;margin-bottom:14px}
+.series-head{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:18px}
+.serie-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border)}
+.serie-row:last-child{border-bottom:none}
+.serie-left{display:flex;align-items:center;gap:14px}
+.serie-num{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.serie-num.last{background:var(--coral);color:#fff}
+.serie-num.normal{background:var(--surface2);border:1.5px solid var(--border2);color:var(--muted)}
+.serie-name{font-size:15px;font-weight:600;color:var(--text);margin-bottom:2px}
+.serie-role{font-size:12px;color:var(--muted)}
+.serie-kg{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700}
+.serie-kg.last{color:var(--coral)}
+.serie-kg.normal{color:var(--text)}
+
+.science-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:18px 20px;margin-bottom:14px}
+.sci-title{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.sci-text{font-size:13px;color:var(--text2);line-height:1.7}
+
+.tips-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:24px;margin-bottom:14px}
+.tips-title{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:700;color:var(--text);margin-bottom:18px}
+.tip{display:flex;gap:14px;margin-bottom:14px;align-items:flex-start}
+.tip:last-child{margin-bottom:0}
+.tip-n{width:24px;height:24px;border-radius:50%;background:var(--coral-light);color:var(--coral);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.tip-txt{font-size:15px;color:var(--text2);line-height:1.65}
+
+.footer{text-align:center;padding-top:48px;padding-bottom:20px}
+.footer-name{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;color:var(--text);margin-bottom:6px}
+.footer-role{font-size:12px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.footer-sci{font-size:12px;color:var(--muted)}
+
+@keyframes up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes rot{to{transform:rotate(360deg)}}
+
+/* Reps por série */
+.rps-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.rps-row:last-child{border-bottom:none}
+.rps-label{font-size:14px;font-weight:600;color:var(--text2);min-width:70px;flex-shrink:0}
+.rps-label span{color:var(--coral);font-weight:700}
+.rps-input{flex:1;background:var(--surface2);border:1.5px solid var(--border2);border-radius:var(--rs);color:var(--text);font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:700;padding:10px 14px;outline:none;text-align:center;transition:border-color .2s;-webkit-appearance:none}
+.rps-input:focus{border-color:var(--coral)}
+.rps-unit{font-size:12px;color:var(--muted);font-weight:600;min-width:20px}
+
+/* Histórico */
+.hist-section{margin-top:40px;padding-top:32px;border-top:1px solid var(--border)}
+.hist-title{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;color:var(--text);margin-bottom:6px}
+.hist-sub{font-size:14px;color:var(--muted);margin-bottom:20px}
+.hist-empty{text-align:center;padding:32px 20px;background:var(--surface2);border-radius:var(--r);border:1px dashed var(--border2)}
+.hist-empty-icon{font-size:32px;margin-bottom:10px}
+.hist-empty-txt{font-size:14px;color:var(--muted)}
+.hist-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;margin-bottom:10px;position:relative}
+.hist-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
+.hist-card-ex{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;color:var(--text)}
+.hist-card-date{font-size:11px;color:var(--muted);font-weight:500;margin-top:3px}
+.hist-card-badge{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:4px 10px;border-radius:20px;flex-shrink:0}
+.hist-card-badge.ideal{background:var(--green-mid);color:var(--green)}
+.hist-card-badge.leve{background:var(--yellow-mid);color:var(--yellow)}
+.hist-card-badge.muito-leve{background:var(--yellow-mid);color:var(--yellow)}
+.hist-card-badge.pesada,.hist-card-badge.muito-pesada{background:var(--red-mid);color:var(--red)}
+.hist-card-info{display:flex;gap:16px;flex-wrap:wrap}
+.hist-info-item{font-size:13px;color:var(--text2)}
+.hist-info-item b{color:var(--coral);font-weight:700}
+.hist-del{position:absolute;top:14px;right:14px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:4px;transition:color .2s}
+.hist-del:hover{color:var(--red)}
+.btn-hist-clear{width:100%;background:transparent;border:1.5px solid var(--red-mid);border-radius:var(--rs);color:var(--red);font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;padding:12px;cursor:pointer;transition:all .2s;margin-top:10px}
+.btn-hist-clear:hover{background:var(--red-light)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hdr">
+  <h1>Sua Carga<br><em>Certa.</em></h1>
+  <div class="hdr-name">Jhon Guimarães · Personal Trainer</div>
+  <p class="hdr-desc">Preencha ao final do exercício e descubra a carga exata de cada série para o próximo treino.</p>
+</div>
+
+<div class="progress" id="prog-wrap">
+  <div class="progress-track"><div class="progress-fill" id="prog-fill" style="width:20%"></div></div>
+  <div class="progress-info">
+    <span class="progress-step" id="prog-label">Passo 1 de 5</span>
+    <div class="progress-dots">
+      <div class="pdot active" id="d1"></div><div class="pdot" id="d2"></div>
+      <div class="pdot" id="d3"></div><div class="pdot" id="d4"></div><div class="pdot" id="d5"></div>
+    </div>
+  </div>
+</div>
+
+<!-- TELA 1 -->
+<div class="screen active" id="s1">
+  <div class="card focused">
+    <div class="c-label">Passo 1</div>
+    <div class="c-title">Qual exercício?</div>
+    <div class="c-sub">Selecione o exercício que você acabou de terminar</div>
+    <div class="sel-wrap">
+      <select id="sel-ex" onchange="dicaCarga(this.value)">
+        <option value="">Selecione o exercício...</option>
+
+        <optgroup label="🍑 Glúteos &amp; Pernas">
+          <option>Agachamento Livre</option>
+          <option>Agachamento Sumô</option>
+          <option>Agachamento no Smith</option>
+          <option>Agachamento Sumô no Smith</option>
+          <option>Leg Press 45°</option>
+          <option>Leg Press Horizontal</option>
+          <option>Cadeira Extensora</option>
+          <option>Cadeira Flexora</option>
+          <option>Mesa Flexora</option>
+          <option>Cadeira Adutora</option>
+          <option>Cadeira Abdutora</option>
+          <option>Stiff com Halteres</option>
+          <option>Stiff com Barra</option>
+          <option>Hip Thrust</option>
+          <option>Hip Thrust no Smith</option>
+          <option>Afundo / Passada</option>
+          <option>Afundo no Smith</option>
+          <option>Elevação Pélvica</option>
+          <option>Coice no Cabo</option>
+          <option>Coice com Caneleira</option>
+          <option>Coice na Polia Baixa</option>
+          <option>Coice 4 Apoios com Elástico</option>
+          <option>Abdução de Quadril no Cabo</option>
+          <option>Panturrilha em Pé</option>
+          <option>Panturrilha Sentada</option>
+        </optgroup>
+
+        <optgroup label="🏗️ Levantamento Terra &amp; Variações">
+          <option>Levantamento Terra Convencional</option>
+          <option>Levantamento Terra Sumô</option>
+          <option>Levantamento Terra Romeno</option>
+          <option>Levantamento Terra com Halteres</option>
+          <option>Levantamento Terra Unilateral (1 perna)</option>
+        </optgroup>
+
+        <optgroup label="🦾 Costas">
+          <option>Puxada Frente (Pulley)</option>
+          <option>Puxada Frente com Triângulo</option>
+          <option>Puxada Neutra</option>
+          <option>Remada Baixa (Pulley)</option>
+          <option>Remada Curvada com Barra</option>
+          <option>Remada Unilateral com Halter</option>
+          <option>Remada Máquina</option>
+          <option>Remada Cavalinho</option>
+          <option>Pullover com Halter</option>
+          <option>Pullover no Cabo</option>
+        </optgroup>
+
+        <optgroup label="💪 Bíceps">
+          <option>Rosca Direta com Barra Reta</option>
+          <option>Rosca Direta com Barra W (EZ)</option>
+          <option>Rosca Alternada com Halter</option>
+          <option>Rosca Martelo com Halter</option>
+          <option>Rosca Scott com Barra Reta</option>
+          <option>Rosca Scott com Barra W (EZ)</option>
+          <option>Rosca Scott com Halter</option>
+          <option>Rosca Concentrada</option>
+          <option>Rosca no Cabo (Polia Baixa)</option>
+          <option>Rosca 21 com Barra</option>
+        </optgroup>
+
+        <optgroup label="🔥 Tríceps">
+          <option>Tríceps Corda (Polia Alta)</option>
+          <option>Tríceps Barra (Polia Alta)</option>
+          <option>Tríceps Testa com Barra W (EZ)</option>
+          <option>Tríceps Testa com Barra Reta</option>
+          <option>Tríceps Francês com Halter</option>
+          <option>Tríceps Francês com Barra W (EZ)</option>
+          <option>Tríceps Máquina</option>
+          <option>Tríceps Unilateral no Cabo</option>
+          <option>Tríceps Testa Unilateral com Halter</option>
+          <option>Mergulho no Banco (Tríceps)</option>
+        </optgroup>
+
+        <optgroup label="🏋️ Peito">
+          <option>Supino Reto com Barra</option>
+          <option>Supino Reto com Halteres</option>
+          <option>Supino Inclinado com Barra</option>
+          <option>Supino Inclinado com Halteres</option>
+          <option>Supino Declinado com Barra</option>
+          <option>Crucifixo com Halteres</option>
+          <option>Crucifixo no Cabo</option>
+          <option>Cross Over (Cabo)</option>
+          <option>Peck Deck (Máquina)</option>
+          <option>Supino na Máquina</option>
+        </optgroup>
+
+        <optgroup label="🎯 Ombro">
+          <option>Desenvolvimento com Halteres</option>
+          <option>Desenvolvimento com Barra (Military Press)</option>
+          <option>Desenvolvimento na Máquina</option>
+          <option>Elevação Lateral com Halteres</option>
+          <option>Elevação Lateral no Cabo</option>
+          <option>Elevação Lateral na Máquina</option>
+          <option>Elevação Frontal com Halter</option>
+          <option>Elevação Frontal com Barra</option>
+          <option>Elevação Frontal no Cabo</option>
+          <option>Encolhimento com Halteres (Trapézio)</option>
+          <option>Encolhimento com Barra (Trapézio)</option>
+          <option>Face Pull no Cabo</option>
+        </optgroup>
+
+        <optgroup label="🔩 Core &amp; Abdômen">
+          <option>Abdominal com Carga</option>
+          <option>Abdominal na Máquina</option>
+          <option>Prancha com Carga</option>
+          <option>Elevação de Pernas com Caneleira</option>
+        </optgroup>
+      </select>
+    </div>
+    <div class="dica" id="dica-box">
+      <div class="dica-row">
+        <span style="font-size:16px;flex-shrink:0;margin-top:1px">💡</span>
+        <div><div class="dica-title">Como registrar a carga</div><div class="dica-text" id="dica-txt"></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="c-label">Contexto do treino</div>
+    <div class="c-title">Este exercício é o…</div>
+    <div class="c-sub">…do seu treino de hoje. Ex: se já fez agachamento e leg press antes deste, marque 3º</div>
+    <div class="chips" id="chips-ordem">
+      <button class="chip" onclick="setOrdem(1,this)">1º</button>
+      <button class="chip" onclick="setOrdem(2,this)">2º</button>
+      <button class="chip" onclick="setOrdem(3,this)">3º</button>
+      <button class="chip" onclick="setOrdem(4,this)">4º</button>
+      <button class="chip" onclick="setOrdem(5,this)">5º</button>
+      <button class="chip" onclick="setOrdem(6,this)">6º ou mais</button>
+    </div>
+  </div>
+  <button class="btn" onclick="ir(2)">Continuar →</button>
+</div>
+
+<!-- TELA 2 -->
+<div class="screen" id="s2">
+  <div class="card focused">
+    <div class="c-label">Passo 2</div>
+    <div class="c-title">Quantas séries tem este exercício?</div>
+    <div class="c-sub">Conforme prescrito no seu treino pelo Jhon</div>
+    <div class="stepper">
+      <button class="stbtn" onclick="setSeries(totalSeries-1)">−</button>
+      <div><div class="stval" id="val-series">4</div><div class="stunit">séries</div></div>
+      <button class="stbtn" onclick="setSeries(totalSeries+1)">+</button>
+    </div>
+  </div>
+
+  <div class="card" id="card-reps-series">
+    <div class="c-label">Repetições por série</div>
+    <div class="c-title">Quantas reps em cada série?</div>
+    <div class="c-sub">Preencha conforme seu treino prescrito. Ex: se é 15/12/10, coloque um por um</div>
+    <div id="reps-por-serie-inputs"></div>
+  </div>
+
+  <div class="card">
+    <div class="c-label">Série atual</div>
+    <div class="c-title">Qual série você acabou de fazer?</div>
+    <div class="c-sub">Marque a série que você realizou agora</div>
+    <div class="chips" id="chips-serie"></div>
+    <div class="alert-warn" id="alert-serie">
+      <div class="alert-warn-inner"><span style="font-size:16px;flex-shrink:0;margin-top:1px">⚠️</span><span class="alert-warn-txt" id="alert-serie-txt"></span></div>
+    </div>
+  </div>
+  <button class="btn" onclick="ir(3)">Continuar →</button>
+  <button class="btn-ghost" onclick="ir(1)">← Voltar</button>
+</div>
+
+<!-- TELA 3 -->
+<div class="screen" id="s3">
+  <div class="card focused">
+    <div class="c-label">Passo 3</div>
+    <div class="c-title">Seu objetivo principal?</div>
+    <div class="c-sub">Define a intensidade ideal para você</div>
+    <div class="goal-grid">
+      <button class="gpill" onclick="setGoal('perder',this)"><span class="gi">🔥</span><span class="gt">Perder gordura</span><span class="gs">Definição corporal</span></button>
+      <button class="gpill" onclick="setGoal('massa',this)"><span class="gi">💪</span><span class="gt">Ganhar massa</span><span class="gs">Hipertrofia muscular</span></button>
+      <button class="gpill" onclick="setGoal('forca',this)"><span class="gi">⚡</span><span class="gt">Ganhar força</span><span class="gs">Força e potência</span></button>
+      <button class="gpill" onclick="setGoal('saude',this)"><span class="gi">🌿</span><span class="gt">Saúde</span><span class="gs">Bem-estar geral</span></button>
+    </div>
+  </div>
+  <button class="btn" onclick="ir(4)">Continuar →</button>
+  <button class="btn-ghost" onclick="ir(2)">← Voltar</button>
+</div>
+
+<!-- TELA 4 -->
+<div class="screen" id="s4">
+  <div class="card focused">
+    <div class="c-label">Passo 4</div>
+    <div class="c-title">Carga utilizada</div>
+    <div class="c-sub">Informe o peso que você usou nesta série</div>
+    <div class="carga-group">
+      <div class="carga-inner">
+        <div class="carga-label">Peso utilizado</div>
+        <input class="carga-input" id="inp-carga" type="number" placeholder="0" min="0.5" max="500" step="0.5" inputmode="decimal">
+      </div>
+      <div class="carga-unit">kg</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="c-label">Repetições</div>
+    <div class="c-title">Quantas repetições você fez?</div>
+    <div class="stepper" style="padding:4px 0 14px">
+      <button class="stbtn" onclick="setReps(repsFeitas-1)">−</button>
+      <div><div class="stval" id="val-reps">12</div><div class="stunit">repetições</div></div>
+      <button class="stbtn" onclick="setReps(repsFeitas+1)">+</button>
+    </div>
+    <div class="chips" style="justify-content:center" id="chips-reps">
+      <button class="chip" onclick="setReps(6)">6</button>
+      <button class="chip" onclick="setReps(8)">8</button>
+      <button class="chip" onclick="setReps(10)">10</button>
+      <button class="chip on" onclick="setReps(12)">12</button>
+      <button class="chip" onclick="setReps(15)">15</button>
+      <button class="chip" onclick="setReps(20)">20</button>
+    </div>
+  </div>
+  <button class="btn" onclick="ir(5)">Continuar →</button>
+  <button class="btn-ghost" onclick="ir(3)">← Voltar</button>
+</div>
+
+<!-- TELA 5 -->
+<div class="screen" id="s5">
+  <div class="card focused">
+    <div class="c-label">Passo 5 — A pergunta mais importante</div>
+    <div class="c-title">Ao terminar a série...</div>
+    <div class="c-sub">Quantas repetições você ainda conseguiria fazer se continuasse? Seja completamente honesto(a) — não tem resposta certa ou errada.</div>
+    <div class="rir-list" id="rir-list">
+      <button class="ropt" onclick="setRir(5,this)"><span class="ropt-n">1</span><span class="ropt-txt">Dava pra fazer mais de 5 repetições ainda</span></button>
+      <button class="ropt" onclick="setRir(4,this)"><span class="ropt-n">2</span><span class="ropt-txt">Dava pra fazer mais umas 3 ou 4 repetições</span></button>
+      <button class="ropt" onclick="setRir(2,this)"><span class="ropt-n">3</span><span class="ropt-txt">Acho que dava pra fazer mais 2 repetições</span></button>
+      <button class="ropt" onclick="setRir(1,this)"><span class="ropt-n">4</span><span class="ropt-txt">Acho que dava mais 1 repetição</span></button>
+      <button class="ropt" onclick="setRir(-1,this)"><span class="ropt-n">5</span><span class="ropt-txt">Dei meu máximo — não conseguiria mais nenhuma repetição</span></button>
+      <button class="ropt" onclick="setRir(0,this)"><span class="ropt-n">6</span><span class="ropt-txt">Não completei todas as repetições</span></button>
+    </div>
+  </div>
+  <button class="btn" onclick="analisar()">Ver minha análise →</button>
+  <button class="btn-ghost" onclick="ir(4)">← Voltar</button>
+</div>
+
+<!-- LOADING -->
+<div id="loading"><div class="spin"></div><div style="font-size:13px;color:var(--muted);font-weight:500">Calculando suas cargas...</div></div>
+
+<!-- RESULTADO -->
+<div id="result">
+  <div class="res-hdr">
+    <div class="res-badge"><div class="hdr-badge-dot"></div><span class="hdr-badge-txt">Resultado da Análise</span></div>
+    <div class="res-ex-name" id="res-ex-name">—</div>
+  </div>
+  <div class="ctx-row" id="ctx-row"></div>
+  <div class="verd" id="verd-card">
+    <div class="verd-deco"></div>
+    <span class="verd-icon" id="verd-icon"></span>
+    <div class="verd-tag" id="verd-tag"></div>
+    <div class="verd-title" id="verd-title"></div>
+    <div class="verd-desc" id="verd-desc"></div>
+    <div class="gauge"><div class="gauge-fill" id="gauge-fill"></div></div>
+    <div class="gauge-labels"><span>Muito leve</span><span>✦ Ideal</span><span>Muito pesada</span></div>
+  </div>
+  <div class="next-hero">
+    <div class="nh-label">Próximo treino — carga da última série</div>
+    <div class="nh-value" id="nh-value">—</div>
+    <div class="nh-sub" id="nh-sub"></div>
+  </div>
+  <div class="series-card">
+    <div class="series-head">Distribuição de carga — todas as séries · Próximo treino</div>
+    <div id="series-rows"></div>
+  </div>
+  <div class="science-card">
+    <div class="sci-title">📐 Base científica utilizada</div>
+    <div class="sci-text" id="sci-text"></div>
+  </div>
+  <div class="tips-card">
+    <div class="tips-title">Recomendações para você</div>
+    <div id="tips-content"></div>
+  </div>
+  <button class="btn" onclick="novaAnalise()">Analisar outro exercício →</button>
+  <button class="btn-ghost" onclick="location.reload()">Recomeçar do zero</button>
+</div>
+
+<!-- HISTÓRICO -->
+<div class="hist-section" id="hist-section">
+  <div class="hist-title">Seu Histórico</div>
+  <div class="hist-sub">Todas as suas análises salvas automaticamente</div>
+  <div id="hist-lista"></div>
+  <button class="btn-hist-clear" onclick="limparHistorico()" id="btn-clear" style="display:none">🗑 Apagar todo o histórico</button>
+</div>
+
+<div class="footer">
+  <div class="footer-name">Jhon Guimarães</div>
+  <div class="footer-role">Personal Trainer · Consultoria Online</div>
+  <div class="footer-sci">Método RIR · Protocolo NSCA · Periodização científica</div>
+</div>
+
+</div>
+<script>
+// --- ESTADO ---
+var exSelected='', ordemEx=0, totalSeries=4, serieAtual=0;
+var goalSelected='', schemeSelected='';
+var repsFeitas=12, cargaUsada=0, rirVal=null;
+var repsPorSerie=[]; // array com as reps de cada série
+
+// --- GOALS ---
+var goals={
+  perder:{label:'Perder gordura',repsMin:12,repsMax:20},
+  massa:{label:'Ganhar massa',repsMin:8,repsMax:12},
+  forca:{label:'Ganhar força',repsMin:3,repsMax:6},
+  saude:{label:'Saúde',repsMin:10,repsMax:15}
+};
+
+// --- PERCENTUAIS NSCA POR N DE SÉRIES ---
+// Base: Baechle & Earle (NSCA, 2008) + Zatsiorsky & Kraemer
+// 1a série = aquecimento, última = carga de trabalho (100%)
+// Crescente: carga AUMENTA a cada série (menos reps)
+// Decrescente: carga DIMINUI a cada série (mais reps = drop)
+var pctNSCA={
+  2:[0.70,1.00],
+  3:[0.60,0.82,1.00],
+  4:[0.55,0.72,0.87,1.00],
+  5:[0.50,0.65,0.80,0.90,1.00],
+  6:[0.48,0.60,0.73,0.83,0.92,1.00]
+};
+
+// Arredonda para multiplo de 5kg — padrao de anilhas de academia (ACSM adaptado)
+function round5(v){ return Math.round(v/5)*5; }
+
+// --- NAVEGAÇÃO ---
+function ir(n){
+  if(n===2){
+    if(!document.getElementById('sel-ex').value){alert('Selecione o exercício!');return;}
+    if(!ordemEx){alert('Qual exercício do dia é este?');return;}
+  }
+  if(n===3){
+    if(!serieAtual){alert('Marque qual série você fez!');return;}
+  }
+  if(n===4){
+    if(!goalSelected){alert('Selecione seu objetivo!');return;}
+    schemeSelected='crescente'; // esquema padrão — removido da interface
+  }
+  if(n===5){
+    cargaUsada=parseFloat(document.getElementById('inp-carga').value);
+    if(!cargaUsada||cargaUsada<=0){alert('Informe a carga que você usou!');return;}
+  }
+  // hide all screens
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});
+  document.getElementById('s'+n).classList.add('active');
+  updateProgress(n);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function updateProgress(n){
+  var pct=(n/5)*100;
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('prog-label').textContent='Passo '+n+' de 5';
+  for(var i=1;i<=5;i++){
+    var d=document.getElementById('d'+i);
+    d.className='pdot'+(i<n?' done':i===n?' active':'');
+  }
+}
+
+// --- SETTERS ---
+function setOrdem(v,el){
+  ordemEx=v;
+  document.querySelectorAll('#chips-ordem .chip').forEach(function(c){c.classList.remove('on')});
+  el.classList.add('on');
+}
+
+function setSeries(v){
+  totalSeries=Math.max(2,Math.min(6,v));
+  document.getElementById('val-series').textContent=totalSeries;
+  buildSerieChips();
+  buildRepsPorSerie();
+  serieAtual=0;
+}
+
+function buildRepsPorSerie(){
+  var cont=document.getElementById('reps-por-serie-inputs');
+  cont.innerHTML='';
+  repsPorSerie=[];
+  for(var i=0;i<totalSeries;i++){
+    repsPorSerie.push(12);
+    var row=document.createElement('div');
+    row.className='rps-row';
+    row.innerHTML=
+      '<div class="rps-label"><span>'+(i+1)+'a</span> série</div>'+
+      '<input class="rps-input" type="number" min="1" max="50" value="12" inputmode="numeric" data-idx="'+i+'" onchange="setRepSerie('+i+',this.value)">'+
+      '<div class="rps-unit">reps</div>';
+    cont.appendChild(row);
+  }
+}
+
+function setRepSerie(idx, val){
+  repsPorSerie[idx]=Math.max(1,Math.min(50,parseInt(val)||12));
+}
+
+// --- HISTÓRICO — armazenamento em memória (fallback seguro) ---
+var HIST_KEY='carga_certa_historico';
+var histMemoria=[]; // fallback se localStorage não disponível
+
+function storageDisponivel(){
+  try{ localStorage.setItem('_t','1'); localStorage.removeItem('_t'); return true; }
+  catch(e){ return false; }
+}
+
+function getHist(){
+  if(storageDisponivel()){
+    try{ return JSON.parse(localStorage.getItem(HIST_KEY)||'[]'); }catch(e){}
+  }
+  return histMemoria;
+}
+
+function setHist(hist){
+  if(storageDisponivel()){
+    try{ localStorage.setItem(HIST_KEY,JSON.stringify(hist)); return; }catch(e){}
+  }
+  histMemoria=hist;
+}
+
+function salvarHistorico(dados){
+  try{
+    var hist=getHist();
+    dados.id=Date.now();
+    dados.data=new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    hist.unshift(dados);
+    if(hist.length>30) hist=hist.slice(0,30);
+    setHist(hist);
+    renderHistorico();
+  }catch(e){ console.log('Histórico erro:',e); }
+}
+
+function renderHistorico(){
+  try{
+    var lista=document.getElementById('hist-lista');
+    var btnClear=document.getElementById('btn-clear');
+    if(!lista) return;
+    var hist=getHist();
+    if(!hist.length){
+      lista.innerHTML='<div class="hist-empty"><div class="hist-empty-icon">📋</div><div class="hist-empty-txt">Suas análises aparecerão aqui automaticamente após cada exercício</div></div>';
+      if(btnClear) btnClear.style.display='none';
+      return;
+    }
+    if(btnClear) btnClear.style.display='block';
+    lista.innerHTML=hist.map(function(h){
+      var rirLabel={5:'Muito leve',4:'Leve',2:'Quase perfeita',1:'Quase perfeita','-1':'No limite',0:'Muito pesada'}[String(h.rir)]||'—';
+      return '<div class="hist-card">'+
+        '<div class="hist-card-top">'+
+          '<div><div class="hist-card-ex">'+(h.exercicio||'—')+'</div><div class="hist-card-date">'+(h.data||'')+'</div></div>'+
+          '<span class="hist-card-badge '+(h.cls||'')+'">'+rirLabel+'</span>'+
+        '</div>'+
+        '<div class="hist-card-info">'+
+          '<div class="hist-info-item">Carga usada: <b>'+(h.carga||'—')+'kg</b></div>'+
+          '<div class="hist-info-item">Sugestão: <b>'+(h.proximaCarga||'—')+'kg</b></div>'+
+          '<div class="hist-info-item">Série: <b>'+(h.serieAtual||'?')+'/'+h.totalSeries+'</b></div>'+
+        '</div>'+
+        '<button class="hist-del" onclick="deletarHistorico('+h.id+')" title="Apagar">✕</button>'+
+      '</div>';
+    }).join('');
+  }catch(e){ console.log('Render histórico erro:',e); }
+}
+
+function deletarHistorico(id){
+  try{
+    var hist=getHist().filter(function(h){return h.id!==id;});
+    setHist(hist);
+    renderHistorico();
+  }catch(e){}
+}
+
+function limparHistorico(){
+  if(confirm('Apagar todo o histórico?')){
+    try{ setHist([]); renderHistorico(); }catch(e){}
+  }
+}
+
+function buildSerieChips(){
+  var c=document.getElementById('chips-serie');
+  c.innerHTML='';
+  for(var i=1;i<=totalSeries;i++){
+    var b=document.createElement('button');
+    b.className='chip';
+    b.textContent=i+'a';
+    if(i===totalSeries){b.textContent=i+'a (última)';}
+    (function(num,btn){
+      btn.onclick=function(){setSerieAtual(num,btn);};
+    })(i,b);
+    c.appendChild(b);
+  }
+}
+buildSerieChips();
+buildRepsPorSerie();
+window.addEventListener('load', function(){ renderHistorico(); });
+
+function setSerieAtual(v,el){
+  serieAtual=v;
+  document.querySelectorAll('#chips-serie .chip').forEach(function(c){c.classList.remove('on')});
+  el.classList.add('on');
+  var alerta=document.getElementById('alert-serie');
+  var alertaTxt=document.getElementById('alert-serie-txt');
+  if(v!==totalSeries){
+    alerta.style.display='block';
+    alertaTxt.textContent='⚡ Atenção: o diagnóstico de carga é mais preciso na última série. Você pode continuar, mas o resultado ideal vem ao preencher após a série '+totalSeries+'a.';
+  } else {
+    alerta.style.display='none';
+  }
+}
+
+function setGoal(g,el){
+  goalSelected=g;
+  document.querySelectorAll('.gpill').forEach(function(b){b.classList.remove('on')});
+  el.classList.add('on');
+}
+
+function setScheme(s,el){
+  schemeSelected=s;
+  document.querySelectorAll('.spill').forEach(function(b){b.classList.remove('on')});
+  el.classList.add('on');
+}
+
+function setReps(v){
+  repsFeitas=Math.max(1,Math.min(50,v));
+  document.getElementById('val-reps').textContent=repsFeitas;
+  document.querySelectorAll('#chips-reps .chip').forEach(function(c){
+    c.classList.toggle('on',parseInt(c.textContent)===repsFeitas);
+  });
+}
+
+function setRir(v,el){
+  rirVal=v;
+  document.querySelectorAll('#rir-list .ropt').forEach(function(b){b.classList.remove('on')});
+  el.classList.add('on');
+}
+
+// --- DICA DE CARGA ---
+var dicasMap={
+  // Leg Press
+  'Leg Press 45°':'Coloque <strong>apenas o peso das anilhas</strong> adicionadas. Não some o peso da plataforma. Ex: duas anilhas de 10kg de cada lado = <strong>40kg</strong>.',
+  'Leg Press Horizontal':'Coloque <strong>apenas o peso das anilhas</strong> adicionadas. Não inclua o peso do carro/plataforma.',
+  // Agachamentos com barra/Smith
+  'Agachamento no Smith':'Some <strong>barra do Smith + anilhas</strong>. Barra do Smith ≈ <strong>15 a 20kg</strong> — confirme na academia. Ex: barra 15kg + anilhas 20kg = <strong>35kg</strong>.',
+  'Agachamento Sumô no Smith':'Some <strong>barra do Smith + anilhas</strong>. Barra ≈ 15–20kg. Ex: barra 15kg + anilhas 20kg = <strong>35kg</strong>.',
+  'Agachamento Livre':'Some <strong>barra olímpica + anilhas</strong>. Barra olímpica padrão = <strong>20kg</strong>. Ex: barra 20kg + anilhas 20kg = <strong>40kg</strong>.',
+  'Agachamento Sumô':'Se usar <strong>halter</strong>, coloque o peso do halter. Se usar <strong>barra</strong>, some barra (20kg) + anilhas.',
+  // Hip Thrust
+  'Hip Thrust no Smith':'Some <strong>barra do Smith + anilhas</strong>. Barra ≈ 15–20kg. Ex: barra 15kg + anilhas 30kg = <strong>45kg</strong>.',
+  'Hip Thrust':'Se usar <strong>barra olímpica</strong>, some barra (20kg) + anilhas. Se usar halter no colo, coloque só o peso do halter.',
+  // Afundo
+  'Afundo no Smith':'Some <strong>barra do Smith + anilhas</strong>. Barra ≈ 15–20kg.',
+  // Stiff
+  'Stiff com Barra':'Some <strong>barra olímpica (20kg) + anilhas</strong>. Ex: barra 20kg + anilhas 20kg = <strong>40kg</strong>.',
+  // Levantamento Terra
+  'Levantamento Terra Convencional':'Some <strong>barra olímpica (20kg) + anilhas dos dois lados</strong>. Ex: barra 20kg + 40kg em anilhas = <strong>60kg</strong>.',
+  'Levantamento Terra Sumô':'Some <strong>barra olímpica (20kg) + anilhas dos dois lados</strong>. Ex: barra 20kg + 40kg = <strong>60kg</strong>.',
+  'Levantamento Terra Romeno':'Some <strong>barra olímpica (20kg) + anilhas</strong>. Ex: barra 20kg + 30kg = <strong>50kg</strong>.',
+  'Levantamento Terra com Halteres':'Coloque o <strong>peso de um halter</strong>. Não some os dois. Ex: dois halteres de 20kg → registre <strong>20kg</strong>.',
+  'Levantamento Terra Unilateral (1 perna)':'Coloque o <strong>peso de um halter</strong>. Ex: halter de 15kg → registre <strong>15kg</strong>.',
+  // Costas com barra
+  'Remada Curvada com Barra':'Some <strong>barra olímpica (20kg) + anilhas</strong>. Ex: barra 20kg + 20kg = <strong>40kg</strong>.',
+  // Biceps com barra
+  'Rosca Direta com Barra Reta':'Some <strong>barra + anilhas</strong>. Barra reta de academia ≈ <strong>5 a 10kg</strong>. Confirme o peso escrito na barra.',
+  'Rosca Direta com Barra W (EZ)':'Some <strong>barra W + anilhas</strong>. Barra W ≈ <strong>5 a 10kg</strong>. Confirme o peso escrito na barra.',
+  'Rosca Scott com Barra Reta':'Some <strong>barra + anilhas</strong>. Barra reta ≈ 5 a 10kg. Confirme o peso na barra.',
+  'Rosca Scott com Barra W (EZ)':'Some <strong>barra W + anilhas</strong>. Barra W ≈ 5 a 10kg. Confirme o peso na barra.',
+  'Rosca 21 com Barra':'Some <strong>barra + anilhas</strong>. Barra reta ≈ 5 a 10kg.',
+  // Triceps com barra
+  'Tríceps Testa com Barra W (EZ)':'Some <strong>barra W + anilhas</strong>. Barra W ≈ 5 a 10kg. Confirme o peso na barra.',
+  'Tríceps Testa com Barra Reta':'Some <strong>barra reta + anilhas</strong>. Barra ≈ 5 a 10kg.',
+  'Tríceps Francês com Barra W (EZ)':'Some <strong>barra W + anilhas</strong>. Barra W ≈ 5 a 10kg.',
+  // Supino com barra
+  'Supino Reto com Barra':'Some <strong>barra olímpica (20kg) + anilhas</strong>. Ex: barra 20kg + 20kg = <strong>40kg</strong>.',
+  'Supino Inclinado com Barra':'Some <strong>barra olímpica (20kg) + anilhas</strong>. Ex: barra 20kg + 20kg = <strong>40kg</strong>.',
+  'Supino Declinado com Barra':'Some <strong>barra olímpica (20kg) + anilhas</strong>. Ex: barra 20kg + 20kg = <strong>40kg</strong>.',
+  // Ombro com barra
+  'Desenvolvimento com Barra (Military Press)':'Some <strong>barra olímpica (20kg) + anilhas</strong>. Ex: barra 20kg + 20kg = <strong>40kg</strong>.',
+  // Encolhimento
+  'Encolhimento com Barra (Trapézio)':'Some <strong>barra olímpica (20kg) + anilhas</strong>.'
+};
+
+var dicasPadrao=[
+  // Aparelhos com pino
+  'Cadeira Extensora','Cadeira Flexora','Mesa Flexora','Cadeira Adutora','Cadeira Abdutora',
+  'Puxada Frente (Pulley)','Puxada Frente com Triângulo','Puxada Neutra',
+  'Remada Baixa (Pulley)','Remada Máquina',
+  'Tríceps Corda (Polia Alta)','Tríceps Barra (Polia Alta)','Tríceps Máquina',
+  'Tríceps Unilateral no Cabo',
+  'Rosca no Cabo (Polia Baixa)',
+  'Peck Deck (Máquina)','Supino na Máquina',
+  'Desenvolvimento na Máquina',
+  'Elevação Lateral na Máquina',
+  'Panturrilha em Pé','Panturrilha Sentada',
+  'Abdominal na Máquina',
+  'Cross Over (Cabo)','Crucifixo no Cabo',
+  'Coice no Cabo','Coice na Polia Baixa','Abdução de Quadril no Cabo',
+  'Face Pull no Cabo','Pullover no Cabo',
+  'Elevação Lateral no Cabo','Elevação Frontal no Cabo'
+];
+
+function dicaCarga(ex){
+  var box=document.getElementById('dica-box');
+  var txt=document.getElementById('dica-txt');
+  if(!ex){box.style.display='none';return;}
+  if(dicasMap[ex]){
+    txt.innerHTML=dicasMap[ex];
+    box.style.display='block';
+  } else if(dicasPadrao.indexOf(ex)>=0){
+    txt.innerHTML='Coloque o <strong>peso selecionado no pino do aparelho</strong>. Não inclua o peso da estrutura do equipamento.';
+    box.style.display='block';
+  } else if(ex.indexOf('Caneleira')>=0){
+    txt.innerHTML='Coloque o <strong>peso da caneleira</strong> que está usando. Ex: caneleira de 5kg → registre <strong>5kg</strong>.';
+    box.style.display='block';
+  } else if(ex.indexOf('Elástico')>=0){
+    txt.innerHTML='Para exercícios com elástico, registre a <strong>tensão equivalente em kg</strong> se souber, ou use 0 e foque apenas no RIR para o diagnóstico.';
+    box.style.display='block';
+  } else if(ex.indexOf('Halter')>=0||ex.indexOf('Halteres')>=0){
+    txt.innerHTML='Coloque o <strong>peso de um halter</strong>, não some os dois. Ex: dois halteres de 10kg → registre <strong>10kg</strong>.';
+    box.style.display='block';
+  } else if(ex.indexOf('Rosca')>=0||ex.indexOf('Scott')>=0||ex.indexOf('Concentrada')>=0||ex.indexOf('Martelo')>=0){
+    txt.innerHTML='Se usar <strong>halteres</strong>: peso de um halter. Se usar <strong>barra</strong>: barra + anilhas (barra ≈ 5–10kg). Se for no <strong>cabo/polia</strong>: peso no pino.';
+    box.style.display='block';
+  } else if(ex.indexOf('Desenvolvimento')>=0||ex.indexOf('Military')>=0){
+    txt.innerHTML='Se usar <strong>halteres</strong>: peso de um halter. Se usar <strong>barra</strong>: barra olímpica (20kg) + anilhas.';
+    box.style.display='block';
+  } else if(ex.indexOf('Elevação')>=0||ex.indexOf('Encolhimento')>=0){
+    txt.innerHTML='Se usar <strong>halteres</strong>: peso de um halter. Se for no <strong>cabo</strong>: peso no pino do aparelho.';
+    box.style.display='block';
+  } else if(ex.indexOf('Supino')>=0||ex.indexOf('Crucifixo')>=0||ex.indexOf('Pullover')>=0){
+    txt.innerHTML='Se usar <strong>halteres</strong>: peso de um halter. Se usar <strong>barra</strong>: barra (20kg) + anilhas. Se for na <strong>máquina/cabo</strong>: peso no pino.';
+    box.style.display='block';
+  } else if(ex.indexOf('Triceps')>=0||ex.indexOf('Tríceps')>=0||ex.indexOf('Mergulho')>=0){
+    txt.innerHTML='Se for no <strong>cabo/polia</strong>: peso no pino. Se usar <strong>halter</strong>: peso do halter. Se usar <strong>barra</strong>: barra + anilhas (barra ≈ 5–10kg).';
+    box.style.display='block';
+  } else if(ex.indexOf('Remada')>=0||ex.indexOf('Puxada')>=0){
+    txt.innerHTML='Se for no <strong>aparelho/cabo</strong>: peso no pino. Se usar <strong>halter</strong>: peso do halter. Se usar <strong>barra</strong>: barra (20kg) + anilhas.';
+    box.style.display='block';
+  } else {
+    box.style.display='none';
+  }
+}
+
+// --- ANÁLISE PRINCIPAL ---
+function analisar(){
+  if(rirVal===null){alert('Responda a pergunta sobre as repetições!');return;}
+  document.getElementById('s5').classList.remove('active');
+  document.getElementById('loading').style.display='block';
+  document.getElementById('prog-wrap').style.display='none';
+  setTimeout(mostrarResultado,1400);
+}
+
+function mostrarResultado(){
+  document.getElementById('loading').style.display='none';
+  var carga=cargaUsada;
+  var ex=document.getElementById('sel-ex').value;
+  var goal=goals[goalSelected];
+  var n=totalSeries;
+  var scheme=schemeSelected;
+
+  // -- DIAGNÓSTICO RIR --
+  var status,gaugeW,gaugeColor,dicas,proximaCarga,proximaSub;
+  var adj10=round5(carga*0.10), adj15=round5(carga*0.15), adj20=round5(carga*0.20);
+  var mais10=round5(carga+adj10), mais15=round5(carga+adj15);
+  var menos10=round5(carga-adj10), menos20=round5(carga-adj20);
+
+  if(rirVal===5){
+    status={icon:'⚠️',tag:'Carga Muito Leve',title:'Você pode e deve carregar mais!',desc:'Você terminou a série com muita reserva. Carga leve demais não gera o estímulo necessário para mudança corporal — o músculo precisa ser desafiado.',cls:'muito-leve'};
+    gaugeW=10; gaugeColor='linear-gradient(90deg,#f0b429,#e8a010)';
+    proximaCarga=mais15; proximaSub='Aumente '+adj15+'kg (15%) no próximo treino';
+    dicas=['Adicione '+adj15+'kg no próximo treino e observe como se sente nas últimas repetições','Para '+goal.label.toLowerCase()+', as últimas 2-3 reps devem ser claramente difíceis de completar','Carga insuficiente = ausência de sobrecarga progressiva = sem resultado. É a lei do treinamento','Mantenha a execução perfeita ao aumentar. Qualidade sempre antes de quantidade'];
+  } else if(rirVal===4){
+    status={icon:'📈',tag:'Carga Um Pouco Leve',title:'Quase lá — sobe um pouco!',desc:'Você está no caminho certo, mas ainda tem espaço para progredir. Um pequeno aumento já vai fazer diferença real no seu resultado.',cls:'leve'};
+    gaugeW=28; gaugeColor='linear-gradient(90deg,#f0b429,#e07030)';
+    proximaCarga=mais10; proximaSub='Aumente '+adj10+'kg (10%) no próximo treino';
+    dicas=['Adicione '+adj10+'kg — pequenas progressões semanais acumulam resultados enormes','Você está muito perto da zona ideal. Não tenha medo de avançar!','Monitore: nas últimas 2 reps da última série você deve estar no seu limite','Progressão gradual de carga é o principal motor de transformação corporal'];
+  } else if(rirVal===2||rirVal===1){
+    // RIR 1-2 = muito próximo da zona ideal — Zourdos et al. (2016)
+    // Conselho: elogiar e sugerir testar um pequeno aumento para encontrar a carga exata da falha
+    var incremento = round5(carga * 0.05); // 5% = menor incremento seguro — ACSM
+    if(incremento < 0.5) incremento = 0.5;
+    var cargaTeste = round5(carga + incremento);
+    var descRIR = rirVal===2
+      ? 'Você terminou com 2 repetições sobrando — está muito perto da carga certa! No próximo treino, tente adicionar apenas '+incremento+'kg. Com esse pequeno aumento, você deve chegar exatamente na falha muscular — e é aí que a transformação acontece de verdade.'
+      : 'Você terminou com 1 repetição sobrando — está praticamente na carga certa! No próximo treino, experimente adicionar apenas '+incremento+'kg para chegar exatamente na falha. Esse pequeno ajuste vai revelar sua carga perfeita.';
+    status={
+      icon:'🌟',
+      tag:'Quase Perfeita!',
+      title:'Parabéns — você está muito perto!',
+      desc: descRIR,
+      cls:'ideal'
+    };
+    gaugeW=54; gaugeColor='linear-gradient(90deg,#2a7a52,#3dba74)';
+    proximaCarga=cargaTeste; proximaSub='Teste '+incremento+'kg a mais — busque a falha na última série';
+    dicas=[
+      'Parabéns! Poucas pessoas encontram essa zona naturalmente — você está treinando do jeito certo',
+      'No próximo treino adicione apenas '+incremento+'kg ('+cargaTeste+'kg no total) e tente completar todas as reps',
+      'Se conseguir completar com '+incremento+'kg a mais sobrando 0-1 rep, essa é a sua carga certa definitiva',
+      'Se não conseguir completar todas as reps com '+cargaTeste+'kg, volte para '+carga+'kg — você já estava no ponto!'
+    ];
+  } else if(rirVal===-1){
+    // RIR 0 = falha concêntrica. Na última série = aceitável ocasionalmente.
+    // Em séries intermediárias = sinal de carga excessiva.
+    // Base: Schoenfeld & Grgic (2019) — treino até a falha não é necessário para hipertrofia,
+    // mas pode ser usado pontualmente na última série sem prejuízo.
+    var eUltimaSerie = (serieAtual === totalSeries);
+    if(eUltimaSerie){
+      status={icon:'💪',tag:'No Limite — Última Série',title:'Carga aceitável na última série!',desc:'Dar o máximo na última série é aceitável ocasionalmente. A ciência mostra que treinar até a falha na última série não prejudica o resultado, mas fazer isso em todas as séries todo treino aumenta o risco de lesão e dificulta a recuperação.',cls:'ideal'};
+      gaugeW=68; gaugeColor='linear-gradient(90deg,#2a7a52,#c85820)';
+      proximaCarga=carga; proximaSub='Mantenha esta carga — está no limite ideal';
+      dicas=[
+        'Esta carga está no limite máximo aceitável — mantenha apenas se a execução foi perfeita em todas as reps',
+        'Se sentir que a execução comprometeu nas últimas reps, reduza '+adj10+'kg para proteger a técnica',
+        'Dar o máximo na última série ocasionalmente é válido — mas não faça isso em todas as séries todo treino',
+        'No próximo treino, tente terminar com 1 rep sobrando: esse é o ponto ideal de acordo com Zourdos et al. (2016)'
+      ];
+    } else {
+      status={icon:'⚠️',tag:'Carga Alta — Série Intermediária',title:'Atenção: você atingiu o limite antes da última série!',desc:'Dar o máximo em uma série intermediária significa que nas séries seguintes a qualidade de execução vai cair. Isso aumenta o risco de lesão e reduz o resultado das próximas séries.',cls:'pesada'};
+      gaugeW=78; gaugeColor='linear-gradient(90deg,#c85820,#d04020)';
+      proximaCarga=menos10; proximaSub='Reduza '+adj10+'kg (10%) no próximo treino';
+      dicas=[
+        'Reduza '+adj10+'kg — você deve conseguir terminar a série '+serieAtual+'a com 1-2 reps sobrando',
+        'Atingir o limite em séries intermediárias compromete a qualidade das séries seguintes',
+        'O diagnóstico ideal vem sempre na última série: é lá que a carga real se revela',
+        'Mantenha a execução perfeita em todas as séries — qualidade supera quantidade'
+      ];
+    }
+  } else {
+    status={icon:'🚨',tag:'Carga Muito Alta!',title:'Reduza agora!',desc:'Você não conseguiu completar todas as repetições. Isso indica que a carga está além da sua capacidade atual. Reduzir é a decisão mais inteligente — e mais eficaz.',cls:'muito-pesada'};
+    gaugeW=96; gaugeColor='linear-gradient(90deg,#d04020,#901010)';
+    proximaCarga=menos20; proximaSub='Reduza '+adj20+'kg imediatamente';
+    dicas=['Reduza '+adj20+'kg agora — você vai conseguir completar as séries com qualidade','Não completar repetições significa que o músculo não recebeu o estímulo completo','Carga segura + execução perfeita = resultado real. Peso alto sem controle = zero resultado','Progrida de volta aos poucos assim que dominar a nova carga com execução impecável'];
+  }
+
+  // -- CÁLCULO DAS SÉRIES (NSCA) --
+  var pcts=pctNSCA[Math.min(6,Math.max(2,n))];
+
+  // Ajuste por esquema
+  // crescente: última série é a mais pesada → pcts normais
+  // decrescente: 1a série é a mais pesada → inverte os pcts
+  // fixo: todas próximas de 100%, só 1a é aquecimento
+  // piramide: sobe até meio e desce
+  // misto: sobe, fica, desce levemente
+  var seriesPcts=[];
+  if(scheme==='crescente'){
+    seriesPcts=pcts.slice(0,n);
+  } else if(scheme==='decrescente'){
+    seriesPcts=pcts.slice(0,n).reverse();
+  } else if(scheme==='fixo'){
+    // 1a = aquecimento ~60-65%, demais = 100% (aquecimento apenas na primeira)
+    seriesPcts=[];
+    for(var i=0;i<n;i++){
+      if(i===0) seriesPcts.push(n<=3?0.65:0.60);
+      else seriesPcts.push(1.00);
+    }
+  } else if(scheme==='piramide'){
+    // Sobe até o pico (meio) e desce
+    seriesPcts=[];
+    var mid=Math.floor(n/2);
+    for(var i=0;i<n;i++){
+      var distToPeak=Math.abs(i-mid);
+      var pct=1.0-(distToPeak*0.12);
+      if(i===0) pct=0.60;
+      seriesPcts.push(Math.max(0.55,pct));
+    }
+    // normaliza para que o pico seja 100%
+    var maxPct=Math.max.apply(null,seriesPcts);
+    seriesPcts=seriesPcts.map(function(p){return p/maxPct;});
+  } else {
+    // misto: crescente + fixo + decrescente leve
+    seriesPcts=[];
+    for(var i=0;i<n;i++){
+      if(i===0) seriesPcts.push(0.58);
+      else if(i===n-1) seriesPcts.push(0.90);
+      else if(i===n-2||n<=3) seriesPcts.push(1.00);
+      else seriesPcts.push(1.00);
+    }
+  }
+
+  // Calcula cargas reais
+  var seriesCargas=seriesPcts.map(function(p){return round5(proximaCarga*p);});
+  // Garante que a última seja exatamente proximaCarga
+  seriesCargas[seriesCargas.length-1]=proximaCarga;
+
+  // -- PAPÉIS DAS SÉRIES --
+  var roles={
+    crescente:['Aquecimento específico','Progressão','Progressão','Carga de trabalho','Carga de trabalho','Carga de trabalho'],
+    decrescente:['Carga máxima','Drop set','Drop set','Drop set finalização','Drop set','Drop set'],
+    fixo:['Aquecimento específico','Trabalho','Trabalho','Trabalho','Trabalho','Trabalho'],
+    piramide:['Aquecimento','Progressão','Pico / Carga máxima','Descarga progressiva','Descarga','Descarga'],
+    misto:['Aquecimento','Pico / Carga máxima','Pico / Carga máxima','Transição','Finalização','Finalização']
+  };
+  var rolesArr=roles[scheme]||roles['crescente'];
+
+  // -- ALERTA DECRESCENTE --
+  var sciBase='';
+  if(scheme==='decrescente'){
+    sciBase='<strong>Séries decrescentes:</strong> a 1a série é a mais intensa, exigindo aquecimento geral prévio (5-10 min de cardio leve + mobilidade). Protocolo baseado em Zatsiorsky & Kraemer (Science and Practice of Strength Training). ';
+  } else {
+    sciBase='<strong>Protocolo de aquecimento progressivo NSCA</strong> (Baechle & Earle, 2008): 1a série = ativação sem fadiga, séries intermediárias = recrutamento progressivo, última = carga de trabalho. ';
+  }
+  sciBase+='<strong>Arredondamento ACSM</strong> para incrementos de 0,5kg. <strong>Método RIR</strong> (Reps In Reserve) como ferramenta de autoregulação da intensidade — validado por Helms et al. (2016, JSCR).';
+
+  // -- PREENCHE HTML --
+  var vc=document.getElementById('verd-card');
+  vc.className='verd '+status.cls;
+  document.getElementById('verd-icon').textContent=status.icon;
+  document.getElementById('verd-tag').textContent=status.tag;
+  document.getElementById('verd-title').textContent=status.title;
+  document.getElementById('verd-desc').textContent=status.desc;
+
+  var gf=document.getElementById('gauge-fill');
+  gf.style.background=gaugeColor;
+  setTimeout(function(){gf.style.width=gaugeW+'%';},300);
+
+  document.getElementById('nh-value').textContent=proximaCarga+'kg';
+  document.getElementById('nh-sub').textContent=proximaSub;
+  document.getElementById('res-ex-name').textContent=ex;
+
+  // Contexto tags
+  var ordemLabel=['','1o exercício do dia','2o exercício do dia','3o exercício do dia','4o exercício do dia','5o exercício do dia','6o exercício ou mais'][ordemEx]||'';
+  document.getElementById('ctx-row').innerHTML=
+    '<div class="ctx-tag"><b>'+ordemLabel+'</b></div>'+
+    '<div class="ctx-tag">Série <b>'+serieAtual+'</b> de <b>'+n+'</b></div>'+
+    '<div class="ctx-tag">Objetivo: <b>'+goal.label+'</b></div>';
+
+  // Tabela de séries
+  var rows='';
+  for(var i=0;i<n;i++){
+    var isLast=(i===n-1);
+    var numCls=isLast?'last':'normal';
+    var kgCls=isLast?'last':'normal';
+    var repsDestaSerie=repsPorSerie[i]||12;
+    rows+='<div class="serie-row">'+
+      '<div class="serie-left">'+
+        '<div class="serie-num '+numCls+'">'+(i+1)+'</div>'+
+        '<div><div class="serie-name">'+(isLast?'Última série ★':'Série '+(i+1))+'</div>'+
+        '<div class="serie-role">'+rolesArr[i]+' · <b>'+repsDestaSerie+' reps</b></div></div>'+
+      '</div>'+
+      '<div class="serie-kg '+kgCls+'">'+seriesCargas[i]+'kg</div>'+
+    '</div>';
+  }
+  document.getElementById('series-rows').innerHTML=rows;
+  document.getElementById('sci-text').innerHTML=sciBase;
+
+  // Dicas
+  var tipsHtml='';
+  dicas.forEach(function(d,i){
+    tipsHtml+='<div class="tip"><div class="tip-n">'+(i+1)+'</div><div class="tip-txt">'+d+'</div></div>';
+  });
+  document.getElementById('tips-content').innerHTML=tipsHtml;
+
+  document.getElementById('result').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+
+  // -- SALVAR NO HISTÓRICO --
+  salvarHistorico({
+    exercicio: ex,
+    carga: carga,
+    proximaCarga: proximaCarga,
+    serieAtual: serieAtual,
+    totalSeries: n,
+    rir: rirVal,
+    cls: status.cls,
+    goal: goal.label
+  });
+}
+
+function novaAnalise(){
+  document.getElementById('result').style.display='none';
+  document.getElementById('prog-wrap').style.display='block';
+  document.querySelector('.screen.active')&&document.querySelector('.screen.active').classList.remove('active');
+  document.getElementById('s1').classList.add('active');
+  document.getElementById('inp-carga').value='';
+  document.getElementById('sel-ex').value='';
+  document.getElementById('dica-box').style.display='none';
+  document.querySelectorAll('.chip').forEach(function(c){c.classList.remove('on')});
+  document.querySelectorAll('.ropt').forEach(function(r){r.classList.remove('on')});
+  document.querySelectorAll('.gpill').forEach(function(g){g.classList.remove('on')});
+  document.querySelectorAll('.spill').forEach(function(s){s.classList.remove('on')});
+  ordemEx=0; serieAtual=0; goalSelected=''; schemeSelected=''; rirVal=null; cargaUsada=0;
+  repsFeitas=12; setReps(12);
+  updateProgress(1);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+</body>
+</html>
