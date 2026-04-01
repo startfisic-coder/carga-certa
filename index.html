@@ -574,8 +574,61 @@ var pctNSCA={
   6:[0.48,0.60,0.73,0.83,0.92,1.00]
 };
 
-// Arredonda para multiplo de 5kg — padrao de anilhas de academia (ACSM adaptado)
-function round5(v){ return Math.round(v/5)*5; }
+// Categorias de equipamento para arredondamento correto
+var exHalter=[
+  'Stiff com Halteres','Hip Thrust','Afundo / Passada',
+  'Elevação Pélvica','Levantamento Terra com Halteres',
+  'Levantamento Terra Unilateral (1 perna)',
+  'Remada Unilateral com Halter','Pullover com Halter',
+  'Rosca Alternada com Halter','Rosca Martelo com Halter',
+  'Rosca Scott com Halter','Rosca Concentrada',
+  'Tríceps Francês com Halter','Tríceps Testa Unilateral com Halter',
+  'Supino Reto com Halteres','Supino Inclinado com Halteres',
+  'Crucifixo com Halteres','Desenvolvimento com Halteres',
+  'Elevação Lateral com Halteres','Elevação Frontal com Halter',
+  'Encolhimento com Halteres (Trapézio)'
+];
+var exBarra=[
+  'Agachamento Livre','Agachamento Sumô','Stiff com Barra',
+  'Levantamento Terra Convencional','Levantamento Terra Sumô',
+  'Levantamento Terra Romeno','Remada Curvada com Barra',
+  'Supino Reto com Barra','Supino Inclinado com Barra',
+  'Supino Declinado com Barra','Desenvolvimento com Barra (Military Press)',
+  'Encolhimento com Barra (Trapézio)',
+  'Rosca Direta com Barra Reta','Rosca Direta com Barra W (EZ)',
+  'Rosca Scott com Barra Reta','Rosca Scott com Barra W (EZ)',
+  'Rosca 21 com Barra',
+  'Tríceps Testa com Barra Reta','Tríceps Testa com Barra W (EZ)',
+  'Tríceps Francês com Barra W (EZ)'
+];
+var exAnilha=[
+  'Leg Press 45°','Leg Press Horizontal','Hack Machine',
+  'Agachamento no Smith','Agachamento Sumô no Smith',
+  'Hip Thrust no Smith','Afundo no Smith'
+];
+
+function getTipoEx(ex){
+  if(exHalter.indexOf(ex)>=0) return 'halter';
+  if(exBarra.indexOf(ex)>=0) return 'barra';
+  if(exAnilha.indexOf(ex)>=0) return 'anilha';
+  // verificar por palavras-chave
+  if(ex.indexOf('Halter')>=0||ex.indexOf('Halteres')>=0) return 'halter';
+  if(ex.indexOf('Barra')>=0||ex.indexOf('Smith')>=0) return 'barra';
+  if(ex.indexOf('Leg Press')>=0||ex.indexOf('Hack')>=0) return 'anilha';
+  return 'aparelho'; // pino — cadeiras, cabos, polias
+}
+
+// Arredonda conforme o equipamento:
+// halter  → 1kg (halteres vêm de 1 em 1kg)
+// barra   → 2.5kg (anilhas de 1, 2, 2.5, 5kg)
+// anilha  → 5kg (leg press, hack machine)
+// aparelho→ 5kg (pino do aparelho de 5 em 5kg)
+function round5(v, ex){
+  var tipo = ex ? getTipoEx(ex) : 'aparelho';
+  if(tipo==='halter') return Math.round(v);        // 1kg
+  if(tipo==='barra')  return Math.round(v/2.5)*2.5; // 2.5kg
+  return Math.round(v/5)*5;                          // 5kg
+}
 
 // --- NAVEGAÇÃO ---
 function ir(n){
@@ -910,9 +963,16 @@ function mostrarResultado(){
 
   // -- DIAGNÓSTICO RIR --
   var status,gaugeW,gaugeColor,dicas,proximaCarga,proximaSub;
-  var adj10=round5(carga*0.10), adj15=round5(carga*0.15), adj20=round5(carga*0.20);
-  var mais10=round5(carga+adj10), mais15=round5(carga+adj15);
-  var menos10=round5(carga-adj10), menos20=round5(carga-adj20);
+  var adj10=round5(carga*0.10,ex), adj15=round5(carga*0.15,ex), adj20=round5(carga*0.20,ex);
+  // garantir mínimo de 1kg de redução/aumento
+  if(adj10<1) adj10=1;
+  if(adj15<1) adj15=1;
+  if(adj20<1) adj20=1;
+  var mais10=round5(carga+adj10,ex), mais15=round5(carga+adj15,ex);
+  var menos10=round5(carga-adj10,ex), menos20=round5(carga-adj20,ex);
+  // garantir que menos nunca seja igual à carga original
+  if(menos10>=carga) menos10=round5(carga-1,ex);
+  if(menos20>=carga) menos20=round5(carga-2,ex);
 
   if(rirVal===5){
     status={icon:'⚠️',tag:'Carga Muito Leve',title:'Você pode e deve carregar mais!',desc:'Você terminou a série com muita reserva. Carga leve demais não gera o estímulo necessário para mudança corporal — o músculo precisa ser desafiado.',cls:'muito-leve'};
@@ -927,8 +987,8 @@ function mostrarResultado(){
   } else if(rirVal===2||rirVal===1){
     // RIR 1-2 = muito próximo da zona ideal — Zourdos et al. (2016)
     // Conselho: elogiar e sugerir testar um pequeno aumento para encontrar a carga exata da falha
-    var incremento = round5(carga * 0.05); // 5% = menor incremento seguro — ACSM
-    if(incremento < 0.5) incremento = 0.5;
+    var incremento = round5(carga * 0.05, ex);
+    if(incremento < 1) incremento = 1;
     var cargaTeste = round5(carga + incremento);
     var descRIR = rirVal===2
       ? 'Você terminou com 2 repetições sobrando — está muito perto da carga certa! No próximo treino, tente adicionar apenas '+incremento+'kg. Com esse pequeno aumento, você deve chegar exatamente na falha muscular — e é aí que a transformação acontece de verdade.'
@@ -1028,7 +1088,7 @@ function mostrarResultado(){
   }
 
   // Calcula cargas reais
-  var seriesCargas=seriesPcts.map(function(p){return round5(proximaCarga*p);});
+  var seriesCargas=seriesPcts.map(function(p){return round5(proximaCarga*p,ex);});
   // Garante que a última seja exatamente proximaCarga
   seriesCargas[seriesCargas.length-1]=proximaCarga;
 
